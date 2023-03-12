@@ -1,0 +1,7 @@
+<h1>Aprenda</h1>
+
+{% for msg in messages %}
+    <div>
+        {{msg.role}}: {{msg['content-html']|safe}}
+    </div>
+{%endfor%}

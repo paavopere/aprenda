@@ -57,7 +57,6 @@ _messages = [
     {'role': 'user', 'content': 'translate'},
     {'role': 'assistant', 'content': '<Of course! Are you a soccer fan? Do you have a favorite '
                                      'team?>'},
-    {'role': 'user', 'content': '¿Sobre qué te gustaría hablar?'},
 ]
 chat = Chat(messages=_messages)
 
@@ -71,4 +70,5 @@ if __name__ == '__main__':
         user_message = input('user: ')
         response = chat.new_message(user_message)
         message = response['choices'][0]['message']
-        print(f"({response['usage']['total_tokens']} tokens) {message['role']}: {message['content']}")
+        print(f"({response['usage']['total_tokens']} tokens) {message['role']}: "
+              f"{message['content']}")
