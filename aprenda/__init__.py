@@ -64,7 +64,8 @@ chat = Chat(messages=_messages)
 if __name__ == '__main__':
 
     for message in chat.messages:
-        print(f"{message['role']}: {message['content']}")
+        pass
+        # print(f"{message['role']}: {message['content']}")
 
     while True:
         user_message = input('user: ')

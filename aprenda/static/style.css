@@ -1,0 +1,7 @@
+.message-user>p {
+    background-color: #7fe58b;
+}
+
+.message-assistant>p {
+    background-color: #b5c5f4;
+}
