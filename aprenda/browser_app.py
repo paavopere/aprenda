@@ -2,15 +2,15 @@ from copy import deepcopy
 import mistune
 from flask import Flask, render_template
 from flask_socketio import SocketIO, send, emit
-from threading import Thread
 from functools import partial
 from aprenda import chat
 
-from time import sleep
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'qwerty'  # TODO replace
-socketio = SocketIO(app, logger=True, engineio_logger=True, async_mode='eventlet', async_handlers=True)
+socketio = SocketIO(
+    app, logger=True, engineio_logger=True, async_mode='eventlet', async_handlers=True
+)
 
 
 @app.route('/')
@@ -24,51 +24,24 @@ def main():
     return render_template('template.html.jinja2', messages=messages)
 
 
-@app.route('/lol')
-def lol():
-    print('lol')
-    return 'lol'
+@socketio.on('message')
+def handle_message(message):
+    print('got', message)
+    payload = {'role': 'user', 'content-html': mistune.html(message)}
+    emit('message', payload)
+    socketio.start_background_task(partial(llm_respond, message))
 
 
-def ayo():
-    sleep(3)
-    print('ayo')
-
-
-def do_the_llm_thing(message):
-    print('doing the LLM thing')
-
+def llm_respond(message):
+    print(f'llm_respond({message=})')
     response = chat.new_message(message)
     response_content = response['choices'][0]['message']['content']
     payload = {
         'role': 'assistant',
         'content-html': mistune.html(response_content),
-        'usage': response['usage']
+        'usage': response['usage'],
     }
     socketio.emit('message', payload)
-
-
-@socketio.on('message')
-def handle_message(message):
-    print('got', message)
-    payload = {
-        'role': 'user',
-        'content-html': mistune.html(message)
-    }
-
-    print('sdfga')
-    emit('message', payload)
-
-    socketio.start_background_task(partial(do_the_llm_thing, message))
-
-    # send(payload, broadcast=True)
-
-    # sleep(3)
-    # payload = {
-    #     'role': 'user',
-    #     'content-html': mistune.html('**hello bro**')
-    # }
-    # emit('message', payload)
 
 
 if __name__ == '__main__':
