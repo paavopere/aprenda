@@ -1,4 +1,8 @@
+# core
+langchain
 openai
+
+# browser app
 mistune
 flask-socketio
 eventlet
