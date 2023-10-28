@@ -1,0 +1,5 @@
+.api-key
+__pycache__
+venv/
+.ipynb_checkpoints
+.streamlit
