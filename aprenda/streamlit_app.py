@@ -1,3 +1,5 @@
+import json
+
 import streamlit as st
 import openai
 from openai.openai_object import OpenAIObject
@@ -70,8 +72,13 @@ def show_user_message(content: str) -> None:
 
 
 def show_bot_message(content: str) -> None:
+    content_dict = json.loads(content)
+
     with st.chat_message('assistant'):
-        st.write(content)
+        st.write(content_dict['response'])
+
+        with st.expander('nitty gritty'):
+            st.write(content_dict)
 
 
 def save_user_message(content: str):
@@ -98,13 +105,19 @@ def main():
         st.session_state['total_tokens'] = 0
 
     # show messages in chat
-
     for message in st.session_state.messages:
-        with st.chat_message(message['role']):
-            st.markdown(message['content'])
+        role = message['role']
+        content = message['content']
+        if role == 'system' and DEBUG:
+            with st.chat_message('assistant'):
+                with st.expander('...'):
+                    st.markdown(content)
+        elif role == 'user':
+            show_user_message(message['content'])
+        elif role == 'assistant':
+            show_bot_message(message['content'])
 
     # work new message
-
     if prompt := st.chat_input('Write something'):
         # write user message
         save_user_message(prompt)
@@ -124,7 +137,6 @@ def main():
         if DEBUG:
             with st.expander('debug info'):
                 st.write(response)
-
                 agg_tokens = st.session_state['total_tokens']
                 st.write(f'Tokens: {agg_tokens} so far / {new_tokens} last msg')
 
