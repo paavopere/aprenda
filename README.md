@@ -12,6 +12,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Create a secrets file and add an OpenAI API key there:
+
+```
+mkdir .streamlit
+echo 'OPENAI_API_KEY = "<insert your key here>"' > .streamlit/secrets
+```
+
 Run:
 
 ```
