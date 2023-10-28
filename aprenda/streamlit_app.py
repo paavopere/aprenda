@@ -1,5 +1,6 @@
 import streamlit as st
 import openai
+from openai.openai_object import OpenAIObject
 
 DEFAULT_MODEL = 'gpt-3.5-turbo'
 SYSTEM_PROMPT = '''
@@ -53,7 +54,8 @@ DEBUG = True
 
 
 
-def get_chat_response():
+
+def get_chat_response() -> OpenAIObject:
     response = openai.ChatCompletion.create(
         model=st.session_state['chat_model'],
         messages=[{'role': m['role'], 'content': m['content']}
@@ -62,14 +64,14 @@ def get_chat_response():
     return response
 
 
-def show_user_message(content: str):
+def show_user_message(content: str) -> None:
     with st.chat_message('user'):
         st.markdown(content)
 
 
-def show_bot_message(response):
+def show_bot_message(content: str) -> None:
     with st.chat_message('assistant'):
-        st.write(response)
+        st.write(content)
 
 
 def save_user_message(content: str):
@@ -110,22 +112,21 @@ def main():
 
         # get response
         response = get_chat_response()
-        print(type(response))
-        print(response)
 
         # write bot message
         response_content = response['choices'][0]['message']['content']
         save_bot_message(response_content)
         show_bot_message(response_content)
 
-        st.session_state.total_tokens += 1
+        new_tokens = response['usage']['total_tokens']
+        st.session_state.total_tokens += new_tokens
 
         if DEBUG:
             with st.expander('debug info'):
                 st.write(response)
 
-                total_tokens = st.session_state['total_tokens']
-                st.write(f'Total tokens: {total_tokens}')
+                agg_tokens = st.session_state['total_tokens']
+                st.write(f'Tokens: {agg_tokens} so far / {new_tokens} last msg')
 
 
 if __name__ == "__main__":
