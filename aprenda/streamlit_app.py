@@ -52,6 +52,36 @@ openai.api_key = st.secrets.get('OPENAI_API_KEY')
 DEBUG = True
 
 
+
+def get_chat_response():
+    response = openai.ChatCompletion.create(
+        model=st.session_state['chat_model'],
+        messages=[{'role': m['role'], 'content': m['content']}
+                    for m in st.session_state.messages]
+    )
+    return response
+
+
+def show_user_message(content: str):
+    with st.chat_message('user'):
+        st.markdown(content)
+
+
+def show_bot_message(response):
+    with st.chat_message('assistant'):
+        st.write(response)
+
+
+def save_user_message(content: str):
+    st.session_state.messages.append({'role': 'user', 'content': content})
+
+
+def save_bot_message(content: str):
+    st.session_state.messages.append({'role': 'assistant', 'content': content})
+
+
+
+
 def main():
 
     # initialize session state
@@ -74,22 +104,21 @@ def main():
     # work new message
 
     if prompt := st.chat_input('Write something'):
-        st.session_state.messages.append({'role': 'user', 'content': prompt})
-        with st.chat_message('user'):
-            st.markdown(prompt)
+        # write user message
+        save_user_message(prompt)
+        show_user_message(prompt)
 
-        with st.chat_message('assistant'):
-            response = openai.ChatCompletion.create(
-                model=st.session_state['chat_model'],
-                messages=[{'role': m['role'], 'content': m['content']}
-                          for m in st.session_state.messages]
-            )
-            response_message = response['choices'][0]['message']
-            print(response)
-            st.write(response_message['content'])
+        # get response
+        response = get_chat_response()
+        print(type(response))
+        print(response)
+
+        # write bot message
+        response_content = response['choices'][0]['message']['content']
+        save_bot_message(response_content)
+        show_bot_message(response_content)
 
         st.session_state.total_tokens += 1
-        st.session_state.messages.append(response_message)
 
         if DEBUG:
             with st.expander('debug info'):
