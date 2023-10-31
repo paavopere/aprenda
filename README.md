@@ -24,3 +24,8 @@ Run:
 ```
 streamlit run aprenda/streamlit_app.py
 ```
+
+Example:
+
+![image](https://github.com/paavopere/aprenda/assets/2135878/718ccf6b-0894-416d-8bea-a3fa8e97cf90)
+
